@@ -3,7 +3,10 @@
   "name": "tdcsp2020-vuegl",
   "description": "Exemplos com VueGL de apoio à palestra proferida no TDC SP 2020",
   "author": "Erick Eduardo Petrucelli <erick.petrucelli@fatectq.edu.br>",
-  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ErickPetru/tdcsp2020-vuegl"
+  },
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
