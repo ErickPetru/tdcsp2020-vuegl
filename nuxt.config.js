@@ -16,7 +16,6 @@ export default {
   },
   components: true,
   router: {
-    middleware: ['redirect'],
     linkActiveClass: 'active',
     linkExactActiveClass: 'exact-active',
   },
