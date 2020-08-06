@@ -8083,6 +8083,11 @@ thread-loader@^2.1.3:
     loader-utils "^1.1.0"
     neo-async "^2.6.0"
 
+three@0.117.1:
+  version "0.117.1"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.117.1.tgz#a49bcb1a6ddea2f250003e42585dc3e78e92b9d3"
+  integrity sha512-t4zeJhlNzUIj9+ub0l6nICVimSuRTZJOqvk3Rmlu+YGdTOJ49Wna8p7aumpkXJakJfITiybfpYE1XN1o1Z34UQ==
+
 through2@^2.0.0:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/through2/-/through2-2.0.5.tgz#01c1e39eb31d07cb7d03a96a70823260b23132cd"
@@ -8481,6 +8486,11 @@ vue-eslint-parser@^7.0.0:
     espree "^6.2.1"
     esquery "^1.0.1"
     lodash "^4.17.15"
+
+vue-gl@0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/vue-gl/-/vue-gl-0.22.0.tgz#a0e6b6c20583605df0bc760c89aaf7cc840318c4"
+  integrity sha512-3G3jwLFQEMUL1qZPYAorkAFhzu3iz1oeZEyENaA7+EyNiHcuVq7mcZnYTqDc1AI+sMTIcrXKJ/FR1Xf0xNi7Ow==
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"

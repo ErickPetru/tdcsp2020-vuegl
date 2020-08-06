@@ -20,7 +20,9 @@
     }
   },
   "dependencies": {
-    "nuxt": "^2.14.0"
+    "nuxt": "^2.14.0",
+    "three": "0.117.1",
+    "vue-gl": "0.22.0"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^3.1.0",
