@@ -6,6 +6,7 @@
         :key="n"
         :href="current === n ? null : `/${n}`"
         :class="{ 'exact-active': current === n }"
+        @click.prevent="$router.push(`/${n}`)"
         >Example {{ n }}</a
       >
     </nav>
