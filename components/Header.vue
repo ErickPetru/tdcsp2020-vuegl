@@ -1,13 +1,14 @@
 <template>
   <header>
     <nav>
+      <span>Exemplo:</span>
       <a
-        v-for="n in 3"
+        v-for="n in 5"
         :key="n"
         :href="current === n ? null : `/${n}`"
         :class="{ 'exact-active': current === n }"
         @click.prevent="$router.push(`/${n}`)"
-        >Example {{ n }}</a
+        >{{ n }}</a
       >
     </nav>
   </header>
@@ -34,6 +35,10 @@ nav {
   height: 3rem;
 }
 
+span {
+  padding: 0.5rem 0;
+}
+
 a {
   padding: 0.5rem;
   text-decoration: none;
@@ -52,6 +57,6 @@ a:focus {
 
 a.exact-active {
   cursor: default;
-  color: #00b7ff20;
+  color: #00b7ff44;
 }
 </style>

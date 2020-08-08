@@ -1,13 +1,20 @@
 <template>
   <section id="example2">
-    <vgl-renderer name="renderer" scene="scene" camera="camera" antialias alpha>
-      <vgl-scene name="scene" background-color="#111">
-        <vgl-box-geometry name="box" />
-        <vgl-mesh-standard-material name="material" />
-        <vgl-mesh geometry="box" material="material" />
-        <vgl-directional-light name="light" position="1 2 3" />
+    <vgl-renderer scene="s" camera="c" antialias>
+      <vgl-scene name="s" background-color="#111">
+        <vgl-sphere-geometry
+          name="g"
+          radius="0.6"
+          width-segments="48"
+          height-segments="48"
+        />
+        <vgl-mesh-standard-material name="m" color="#369" />
+        <vgl-mesh geometry="g" material="m" />
+
+        <vgl-ambient-light intensity="0.1" />
+        <vgl-point-light position="0 1 1" />
       </vgl-scene>
-      <vgl-perspective-camera name="camera" orbit-position="3 1 0.5" />
+      <vgl-perspective-camera name="c" orbit-position="3 1 0.5" />
     </vgl-renderer>
   </section>
 </template>
@@ -15,11 +22,12 @@
 <script>
 import {
   VglRenderer,
-  VglBoxGeometry,
-  VglMeshStandardMaterial,
   VglScene,
+  VglSphereGeometry,
+  VglMeshStandardMaterial,
   VglMesh,
-  VglDirectionalLight,
+  VglAmbientLight,
+  VglPointLight,
   VglPerspectiveCamera,
 } from 'vue-gl'
 
@@ -27,11 +35,12 @@ export default {
   name: 'Example2',
   components: {
     VglRenderer,
-    VglBoxGeometry,
-    VglMeshStandardMaterial,
     VglScene,
+    VglSphereGeometry,
+    VglMeshStandardMaterial,
     VglMesh,
-    VglDirectionalLight,
+    VglAmbientLight,
+    VglPointLight,
     VglPerspectiveCamera,
   },
 }
