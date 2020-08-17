@@ -15,6 +15,8 @@ export default {
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
   },
   components: true,
+  pageTransition: 'fade',
+  css: ['~/assets/base.css'],
   router: {
     linkActiveClass: 'active',
     linkExactActiveClass: 'exact-active',
