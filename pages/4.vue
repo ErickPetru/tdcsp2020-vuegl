@@ -7,34 +7,13 @@
       antialias
       shadow-map-enabled
     >
-      <vgl-scene ref="scene" name="scene" background-color="#fff">
-        <vgl-group
-          :position="`0.15 ${torusPositionY} 0.25`"
-          :rotation="`${torusRotationZ} 0 2 ZYX`"
-        >
-          <vgl-torus-knot-geometry
-            name="torusGeo"
-            radius="0.45"
-            tube="0.065"
-            p="6"
-            q="3"
-            radial-segments="32"
-            tubular-segments="512"
-          />
-          <vgl-mesh-lambert-material
-            ref="torusMat"
-            name="torusMat"
-            color="#3366ff"
-          />
-          <vgl-mesh
-            geometry="torusGeo"
-            material="torusMat"
-            receive-shadow
-            cast-shadow
-          />
-        </vgl-group>
-
-        <vgl-group position="0.5 0.1 0">
+      <vgl-scene
+        ref="scene"
+        name="scene"
+        background-color="#fff"
+        fog="#fff 2 20"
+      >
+        <vgl-group position="-1 0.05 -0.5">
           <vgl-sphere-geometry
             name="sphereGeo"
             radius="0.65"
@@ -43,7 +22,7 @@
           />
           <vgl-mesh-phong-material
             name="sphereMat"
-            color="#00bcd4"
+            color="#4aa619"
             shininess="0"
             specular="#222"
           />
@@ -55,7 +34,23 @@
           />
         </vgl-group>
 
-        <vgl-group name="ground" position="0 -0.5 0">
+        <vgl-group position="0.5 0.1 0">
+          <vgl-box-geometry name="boxGeo" />
+          <vgl-mesh-phong-material
+            name="boxMat"
+            color="#a4117c"
+            shininess="0"
+            specular="#222"
+          />
+          <vgl-mesh
+            geometry="boxGeo"
+            material="boxMat"
+            receive-shadow
+            cast-shadow
+          />
+        </vgl-group>
+
+        <vgl-group name="ground" position="0 -0.45 0">
           <vgl-box-geometry
             name="groundGeo"
             width="100%"
@@ -109,32 +104,26 @@
         </vgl-group>
       </vgl-scene>
 
-      <vgl-perspective-camera name="camera" orbit-position="3 1 0.5" />
-    </vgl-renderer>
-
-    <div class="controls">
-      <span>Rotação:</span>
-      <input
-        v-model="torusRotationZ"
-        type="range"
-        min="-2"
-        max="2"
-        step="0.25"
+      <vgl-perspective-camera
+        ref="camera"
+        name="camera"
+        orbit-position="3 1 0.5"
       />
-    </div>
+    </vgl-renderer>
   </section>
 </template>
 
 <script>
 import * as THREE from 'three'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass.js'
 
 import {
   VglRenderer,
   VglScene,
   VglGroup,
-  VglTorusKnotGeometry,
+  VglSphereGeometry,
   VglBoxGeometry,
-  VglMeshLambertMaterial,
   VglMeshPhongMaterial,
   VglMesh,
   VglHemisphereLight,
@@ -149,9 +138,8 @@ export default {
     VglRenderer,
     VglScene,
     VglGroup,
-    VglTorusKnotGeometry,
+    VglSphereGeometry,
     VglBoxGeometry,
-    VglMeshLambertMaterial,
     VglMeshPhongMaterial,
     VglMesh,
     VglHemisphereLight,
@@ -159,81 +147,40 @@ export default {
     VglSpotLight,
     VglPerspectiveCamera,
   },
-  data() {
-    return {
-      torusPositionY: 0.095,
-      torusDirection: 0.035,
-      torusRotationZ: 0,
-    }
-  },
+  data: () => ({
+    composer: null,
+  }),
   mounted() {
-    this.configureShadows()
-    this.configureReflections()
-    this.animate()
+    const renderer = this.$refs.renderer.inst
+    const scene = this.$refs.scene.inst
+    const camera = this.$refs.camera.inst
+
+    const spotLight1 = this.$refs.sLight1.inst
+    const spotLight2 = this.$refs.sLight2.inst
+    const dirLight = this.$refs.dLight.inst
+
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap
+
+    spotLight1.shadow.mapSize.width = 1024
+    spotLight1.shadow.mapSize.height = 1024
+
+    spotLight2.shadow.mapSize.width = 1024
+    spotLight2.shadow.mapSize.height = 1024
+
+    dirLight.shadow.mapSize.width = 8192
+    dirLight.shadow.mapSize.height = 8192
+
+    this.composer = new EffectComposer(renderer)
+    const ssaoPass = new SSAOPass(scene, camera)
+    ssaoPass.output = SSAOPass.OUTPUT.Depth
+    ssaoPass.kernelRadius = 16
+    this.composer.addPass(ssaoPass)
+
+    renderer.setAnimationLoop(this.animate)
   },
-  methods: {
-    configureShadows() {
-      const renderer = this.$refs.renderer.inst
-      const spotLight1 = this.$refs.sLight1.inst
-      const spotLight2 = this.$refs.sLight2.inst
-      const dirLight = this.$refs.dLight.inst
 
-      renderer.shadowMap.type = THREE.VSMShadowMap
-
-      spotLight1.shadow.camera.near = 1
-      spotLight1.shadow.camera.far = 100
-      spotLight1.shadow.mapSize.width = 256
-      spotLight1.shadow.mapSize.height = 256
-      spotLight1.shadow.bias = -0.0001
-      spotLight1.shadow.radius = 4
-      spotLight2.shadow = spotLight1.shadow
-
-      dirLight.shadow.camera.near = 0.1
-      dirLight.shadow.camera.far = 650
-      dirLight.shadow.camera.right = 10
-      dirLight.shadow.camera.left = -10
-      dirLight.shadow.camera.top = 10
-      dirLight.shadow.camera.bottom = -10
-      dirLight.shadow.mapSize.width = 1024
-      dirLight.shadow.mapSize.height = 1024
-      dirLight.shadow.radius = 7
-      dirLight.shadow.bias = -0.00015
-    },
-
-    configureReflections() {
-      const scene = this.$refs.scene.inst
-      const torusMat = this.$refs.torusMat.inst
-
-      scene.background = new THREE.CubeTextureLoader()
-        .setPath('textures/')
-        .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'])
-
-      torusMat.envMap = scene.background
-      torusMat.refractionRatio = 0.95
-      torusMat.needsUpdate = true
-      scene.needsUpdate = true
-    },
-
-    animate() {
-      requestAnimationFrame(this.animate)
-
-      if (this.torusPositionY < 0.5) {
-        this.torusPositionY += this.torusDirection
-      } else {
-        this.torusPositionY = 0.5
-        this.torusDirection = -0.0035
-      }
-
-      if (this.torusPositionY > 0.095) {
-        this.torusPositionY += this.torusDirection
-      } else {
-        this.torusPositionY = 0.095
-        this.torusDirection = 0.0035
-      }
-
-      const renderer = this.$refs.renderer.inst
-      renderer.needsUpdate = true
-    },
+  animate() {
+    this.composer.render()
   },
 }
 </script>
