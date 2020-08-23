@@ -136,32 +136,45 @@ export default {
     VglSpotLight,
     VglPerspectiveCamera,
   },
+  data: () => ({
+    renderer: null,
+    lights: [],
+  }),
   mounted() {
-    const renderer = this.$refs.renderer.inst
-    const spotLight1 = this.$refs.sLight1.inst
-    const spotLight2 = this.$refs.sLight2.inst
-    const dirLight = this.$refs.dLight.inst
+    this.renderer = this.$refs.renderer.inst
 
-    renderer.shadowMap.type = THREE.VSMShadowMap
+    this.configureLights()
+  },
+  methods: {
+    configureLights() {
+      this.lights = []
 
-    spotLight1.shadow.camera.near = 1
-    spotLight1.shadow.camera.far = 100
-    spotLight1.shadow.mapSize.width = 256
-    spotLight1.shadow.mapSize.height = 256
-    spotLight1.shadow.bias = -0.0001
-    spotLight1.shadow.radius = 5
-    spotLight2.shadow = spotLight1.shadow
+      this.lights[0] = this.$refs.sLight1.inst
+      this.lights[1] = this.$refs.sLight2.inst
+      this.lights[2] = this.$refs.dLight.inst
 
-    dirLight.shadow.camera.near = 0.1
-    dirLight.shadow.camera.far = 650
-    dirLight.shadow.camera.right = 20
-    dirLight.shadow.camera.left = -20
-    dirLight.shadow.camera.top = 20
-    dirLight.shadow.camera.bottom = -20
-    dirLight.shadow.mapSize.width = 512
-    dirLight.shadow.mapSize.height = 512
-    dirLight.shadow.radius = 5
-    dirLight.shadow.bias = -0.00025
+      this.renderer.shadowMap.type = THREE.VSMShadowMap
+
+      this.lights[0].shadow.camera.near = 1
+      this.lights[0].shadow.camera.far = 100
+      this.lights[0].shadow.mapSize.width = 256
+      this.lights[0].shadow.mapSize.height = 256
+      this.lights[0].shadow.bias = -0.0001
+      this.lights[0].shadow.radius = 5
+
+      this.lights[1].shadow = this.lights[0].shadow
+
+      this.lights[2].shadow.camera.near = 0.1
+      this.lights[2].shadow.camera.far = 650
+      this.lights[2].shadow.camera.right = 20
+      this.lights[2].shadow.camera.left = -20
+      this.lights[2].shadow.camera.top = 20
+      this.lights[2].shadow.camera.bottom = -20
+      this.lights[2].shadow.mapSize.width = 512
+      this.lights[2].shadow.mapSize.height = 512
+      this.lights[2].shadow.radius = 5
+      this.lights[2].shadow.bias = -0.00025
+    },
   },
 }
 </script>
