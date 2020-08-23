@@ -3,7 +3,7 @@
     <nav>
       <span>Exemplo:</span>
       <a
-        v-for="n in 5"
+        v-for="n in 6"
         :key="n"
         :href="current === n ? null : `/${n}`"
         :class="{ 'exact-active': current === n }"
