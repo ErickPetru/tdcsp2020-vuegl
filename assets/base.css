@@ -25,6 +25,12 @@ html {
   flex-flow: column;
 }
 
+#app.center {
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
 main {
   flex: 1;
   border-radius: 4px;

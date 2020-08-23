@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="app" class="center">
     <Nuxt />
   </div>
 </template>
@@ -9,11 +9,3 @@ export default {
   name: 'LayoutCenter',
 }
 </script>
-
-<style>
-#app {
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-}
-</style>
