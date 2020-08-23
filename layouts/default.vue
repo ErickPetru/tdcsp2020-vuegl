@@ -3,7 +3,9 @@
     <Header />
 
     <main>
-      <Nuxt />
+      <keep-alive>
+        <Nuxt />
+      </keep-alive>
     </main>
   </div>
 </template>
