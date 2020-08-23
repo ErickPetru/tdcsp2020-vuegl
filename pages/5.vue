@@ -86,7 +86,6 @@
             color="#88c"
             penumbra="0.3"
             :angle="Math.PI / 5"
-            cast-shadow
           />
 
           <vgl-spot-light
@@ -96,7 +95,6 @@
             color="#990"
             penumbra="0.3"
             :angle="Math.PI / 5"
-            cast-shadow
           />
 
           <vgl-directional-light
@@ -109,7 +107,11 @@
         </vgl-group>
       </vgl-scene>
 
-      <vgl-perspective-camera name="camera" orbit-position="3 1 0.5" />
+      <vgl-perspective-camera
+        ref="camera"
+        name="camera"
+        orbit-position="4.25 1 0.5"
+      />
     </vgl-renderer>
 
     <div class="controls">
@@ -159,80 +161,67 @@ export default {
     VglSpotLight,
     VglPerspectiveCamera,
   },
-  data() {
-    return {
-      torusPositionY: 0.095,
-      torusDirection: 0.035,
-      torusRotationZ: 0,
-    }
-  },
+  data: () => ({
+    renderer: null,
+    scene: null,
+    camera: null,
+    material: null,
+    light: null,
+    torusPositionY: 0.095,
+    torusDirection: 0.01,
+    torusRotationZ: 0,
+  }),
   mounted() {
-    this.configureShadows()
-    this.configureReflections()
-    this.animate()
+    this.renderer = this.$refs.renderer.inst
+    this.scene = this.$refs.scene.inst
+    this.camera = this.$refs.camera.inst
+
+    this.configureLights()
+    this.configureMaterials()
+
+    this.renderer.setAnimationLoop(this.animate)
   },
   methods: {
-    configureShadows() {
-      const renderer = this.$refs.renderer.inst
-      const spotLight1 = this.$refs.sLight1.inst
-      const spotLight2 = this.$refs.sLight2.inst
-      const dirLight = this.$refs.dLight.inst
+    configureLights() {
+      this.light = this.$refs.dLight.inst
 
-      renderer.shadowMap.type = THREE.VSMShadowMap
+      this.renderer.shadowMap.type = THREE.VSMShadowMap
 
-      spotLight1.shadow.camera.near = 1
-      spotLight1.shadow.camera.far = 100
-      spotLight1.shadow.mapSize.width = 256
-      spotLight1.shadow.mapSize.height = 256
-      spotLight1.shadow.bias = -0.0001
-      spotLight1.shadow.radius = 4
-      spotLight2.shadow = spotLight1.shadow
-
-      dirLight.shadow.camera.near = 0.1
-      dirLight.shadow.camera.far = 650
-      dirLight.shadow.camera.right = 10
-      dirLight.shadow.camera.left = -10
-      dirLight.shadow.camera.top = 10
-      dirLight.shadow.camera.bottom = -10
-      dirLight.shadow.mapSize.width = 1024
-      dirLight.shadow.mapSize.height = 1024
-      dirLight.shadow.radius = 7
-      dirLight.shadow.bias = -0.00015
+      this.light.shadow.camera.near = 0.1
+      this.light.shadow.camera.far = 500
+      this.light.shadow.mapSize.width = 1024
+      this.light.shadow.mapSize.height = 1024
+      this.light.shadow.bias = -0.0001
+      this.light.shadow.radius = 5
     },
 
-    configureReflections() {
-      const scene = this.$refs.scene.inst
-      const torusMat = this.$refs.torusMat.inst
+    configureMaterials() {
+      this.material = this.$refs.torusMat.inst
 
-      scene.background = new THREE.CubeTextureLoader()
+      this.scene.background = new THREE.CubeTextureLoader()
         .setPath('textures/')
         .load(['px.png', 'nx.png', 'py.png', 'ny.png', 'pz.png', 'nz.png'])
 
-      torusMat.envMap = scene.background
-      torusMat.refractionRatio = 0.95
-      torusMat.needsUpdate = true
-      scene.needsUpdate = true
+      this.material.envMap = this.scene.background
+      this.material.refractionRatio = 0.95
     },
 
     animate() {
-      requestAnimationFrame(this.animate)
-
-      if (this.torusPositionY < 0.5) {
+      if (this.torusPositionY < 0.75) {
         this.torusPositionY += this.torusDirection
       } else {
-        this.torusPositionY = 0.5
-        this.torusDirection = -0.0035
+        this.torusPositionY = 0.75
+        this.torusDirection = -0.01
       }
 
       if (this.torusPositionY > 0.095) {
         this.torusPositionY += this.torusDirection
       } else {
         this.torusPositionY = 0.095
-        this.torusDirection = 0.0035
+        this.torusDirection = 0.01
       }
 
-      const renderer = this.$refs.renderer.inst
-      renderer.needsUpdate = true
+      this.renderer.render(this.scene, this.camera)
     },
   },
 }
