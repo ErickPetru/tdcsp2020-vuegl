@@ -16,6 +16,7 @@ export default {
   },
   components: true,
   pageTransition: 'fade',
+  layoutTransition: 'fade',
   css: ['~/assets/base.css'],
   router: {
     linkActiveClass: 'active',
