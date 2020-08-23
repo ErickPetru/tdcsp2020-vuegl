@@ -4,7 +4,6 @@
       ref="renderer"
       scene="scene"
       camera="camera"
-      antialias
       shadow-map-enabled
     >
       <vgl-scene
@@ -13,7 +12,7 @@
         background-color="#fff"
         fog="#fff 2 20"
       >
-        <vgl-group position="-1 0.05 -0.5">
+        <vgl-group position="-1.25 0.25 -0.5">
           <vgl-sphere-geometry
             name="sphereGeo"
             radius="0.65"
@@ -116,7 +115,9 @@
 <script>
 import * as THREE from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
-import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import { SSAARenderPass } from 'three/examples/jsm/postprocessing/SSAARenderPass.js'
+import { CopyShader } from 'three/examples/jsm/shaders/CopyShader.js'
 
 import {
   VglRenderer,
@@ -148,39 +149,96 @@ export default {
     VglPerspectiveCamera,
   },
   data: () => ({
+    renderer: null,
+    scene: null,
+    camera: null,
+    lights: [],
     composer: null,
+    postprocessing: true,
+    radius: 75,
+    theta: 0,
+    direction: '+',
   }),
   mounted() {
-    const renderer = this.$refs.renderer.inst
-    const scene = this.$refs.scene.inst
-    const camera = this.$refs.camera.inst
+    this.renderer = this.$refs.renderer.inst
+    this.scene = this.$refs.scene.inst
+    this.camera = this.$refs.camera.inst
 
-    const spotLight1 = this.$refs.sLight1.inst
-    const spotLight2 = this.$refs.sLight2.inst
-    const dirLight = this.$refs.dLight.inst
+    this.configureLights()
+    this.configurePostProcessing()
 
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap
-
-    spotLight1.shadow.mapSize.width = 1024
-    spotLight1.shadow.mapSize.height = 1024
-
-    spotLight2.shadow.mapSize.width = 1024
-    spotLight2.shadow.mapSize.height = 1024
-
-    dirLight.shadow.mapSize.width = 8192
-    dirLight.shadow.mapSize.height = 8192
-
-    this.composer = new EffectComposer(renderer)
-    const ssaoPass = new SSAOPass(scene, camera)
-    ssaoPass.output = SSAOPass.OUTPUT.Depth
-    ssaoPass.kernelRadius = 16
-    this.composer.addPass(ssaoPass)
-
-    renderer.setAnimationLoop(this.animate)
+    this.renderer.setAnimationLoop(this.animate)
   },
+  methods: {
+    configureLights() {
+      this.lights = []
 
-  animate() {
-    this.composer.render()
+      this.lights[0] = this.$refs.sLight1.inst
+      this.lights[1] = this.$refs.sLight2.inst
+      this.lights[2] = this.$refs.dLight.inst
+
+      this.renderer.shadowMap.type = THREE.VSMShadowMap
+
+      this.lights[0].shadow.mapSize.width = 256
+      this.lights[0].shadow.mapSize.height = 256
+      this.lights[0].shadow.radius = 10
+      this.lights[0].shadow.bias = -0.00025
+
+      this.lights[1].shadow.mapSize.width = 256
+      this.lights[1].shadow.mapSize.height = 256
+      this.lights[1].shadow.radius = 5
+      this.lights[1].shadow.bias = -0.00025
+
+      this.lights[2].shadow.camera.near = 0.1
+      this.lights[2].shadow.camera.far = 500
+      this.lights[2].shadow.camera.right = 20
+      this.lights[2].shadow.camera.left = -20
+      this.lights[2].shadow.camera.top = 20
+      this.lights[2].shadow.camera.bottom = -20
+      this.lights[2].shadow.mapSize.width = 256
+      this.lights[2].shadow.mapSize.height = 256
+      this.lights[2].shadow.radius = 5
+    },
+
+    configurePostProcessing() {
+      this.composer = new EffectComposer(this.renderer)
+
+      const ssaaRenderPass = new SSAARenderPass(this.scene, this.camera)
+      ssaaRenderPass.unbiased = true
+      ssaaRenderPass.sampleLevel = 4
+      this.composer.addPass(ssaaRenderPass)
+
+      const copyPass = new ShaderPass(CopyShader)
+      this.composer.addPass(copyPass)
+    },
+
+    animate() {
+      if (this.direction === '+' && this.theta > 2) {
+        this.direction = '-'
+      } else if (this.direction === '-' && this.theta < 0) {
+        this.direction = '+'
+      }
+
+      const thetaChange = this.postprocessing ? 0.05 : 0.01
+      if (this.direction === '+') {
+        this.theta += thetaChange
+      } else {
+        this.theta -= thetaChange
+      }
+
+      this.camera.position.x =
+        this.radius * Math.sin(THREE.MathUtils.degToRad(this.theta))
+      this.camera.position.y =
+        this.radius * Math.sin(THREE.MathUtils.degToRad(this.theta))
+
+      this.camera.lookAt(this.scene.position)
+
+      if (this.postprocessing) {
+        this.composer.render()
+      } else {
+        this.renderer.render(this.scene, this.camera)
+      }
+    },
   },
 }
 </script>
