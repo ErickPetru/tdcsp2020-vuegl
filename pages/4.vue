@@ -109,6 +109,15 @@
         orbit-position="3 1 0.5"
       />
     </vgl-renderer>
+
+    <div class="controls">
+      <span>Pós-processamento:</span>
+
+      <div class="checkbox">
+        <input id="postprocessing" v-model="postprocessing" type="checkbox" />
+        <label for="postprocessing">Sim</label>
+      </div>
+    </div>
   </section>
 </template>
 
@@ -154,7 +163,7 @@ export default {
     camera: null,
     lights: [],
     composer: null,
-    postprocessing: true,
+    postprocessing: false,
     radius: 75,
     theta: 0,
     direction: '+',
